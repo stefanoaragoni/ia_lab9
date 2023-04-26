@@ -1,9 +1,11 @@
+import time
 import gym
 import numpy as np
 
-env = gym.make('FrozenLake-v1', desc=None, map_name="4x4", is_slippery=True)
+# ------------------------------ ENTRENAMIENTO DE AGENTE INTELIGENTE ------------------------------
 
 # Inicializar la Q-table
+env = gym.make('FrozenLake-v1', desc=None, map_name="4x4", is_slippery=True)
 Q_table = np.random.rand(env.observation_space.n, env.action_space.n) * 0.01
 
 # Definir los parámetros de entrenamiento
@@ -13,15 +15,15 @@ epsilon = 0.99 # probabilidad de exploración
 
 # Definir el número de episodios y pasos máximos por episodio
 num_episodes = 10000
-max_steps_per_episode = 100
-
 steps = []
 
 # Entrenar el agente
 for episode in range(num_episodes):
     state, probability, *_ = env.reset() # genera un nuevo tablero y devuelve el estado inicial
 
-    for step in range(max_steps_per_episode):
+    contador = 0
+    while True:
+        contador += 1
 
         # Seleccionar una acción con base en la Q-table actual
         if np.random.uniform(0.5, 1) < epsilon:
@@ -40,8 +42,11 @@ for episode in range(num_episodes):
         state = new_state
 
         # Si se alcanza el estado final, terminar el episodio
-        if done:
-            steps.append(step + 1)
+        if done and reward == 0:
+            state, probability, *_ = env.reset()
+            
+        elif done and reward == 1:
+            steps.append(contador)
             break
     
     # Disminuir la probabilidad de exploración
@@ -52,10 +57,17 @@ for episode in range(num_episodes):
 
 print("\nENTRENAMIENTO: Promedio de pasos por episodio: {}".format(sum(steps) / len(steps)))
 
-# Utilizar la Q-table entrenada para jugar el juego
-state, probability, *_ = env.reset() # genera un nuevo tablero y devuelve el estado inicial
 
-for step in range(max_steps_per_episode):
+# ------------------------------ JUGAR EL JUEGO CON AGENTE INTELIGENTE ------------------------------
+
+env = gym.make('FrozenLake-v1', desc=None, map_name="4x4", is_slippery=True, render_mode='human')
+
+state, probability, *_ = env.reset() # genera un nuevo tablero y devuelve el estado inicial
+contador = 0
+
+while True:
+    contador += 1
+
     # Seleccionar la acción óptima utilizando la Q-table entrenada
     action = np.argmax(Q_table[state, :])
 
@@ -65,12 +77,12 @@ for step in range(max_steps_per_episode):
     # Actualizar el estado
     state = new_state
 
-    # Imprimir el estado actual del juego
-    env.render()
-
     # Si se alcanza el estado final, terminar el episodio
-    if done:
-        print("\n\nDONE: finalizado después de {} pasos \n".format(step + 1))
+    if done and reward == 0:
+        state, probability, *_ = env.reset()
+        
+    elif done and reward == 1:
+        print("\n\nDONE: finalizado después de {} pasos \n".format(contador))
         break
 
 env.close()
