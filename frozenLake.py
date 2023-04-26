@@ -33,7 +33,7 @@ for episode in range(num_episodes):
         new_state, reward, done, info, *_ = env.step(action)
         
         # Actualizar la Q-table utilizando la fórmula de Q-learning
-        value = (1 - alpha) * Q_table[state, action] + alpha * (reward + gamma * np.max(Q_table[new_state, :]))
+        value = Q_table[state, action] + alpha * (reward + gamma * np.max(Q_table[new_state, :]) - Q_table[state, action])
         Q_table[state, action] = value
 
         # Actualizar el estado
