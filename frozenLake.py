@@ -1,6 +1,7 @@
 import time
 import gym
 import numpy as np
+import matplotlib.pyplot as plt
 
 # ------------------------------ ENTRENAMIENTO DE AGENTE INTELIGENTE ------------------------------
 
@@ -14,19 +15,18 @@ alpha = 0.8 # tasa de aprendizaje
 epsilon = 0.99 # probabilidad de exploración
 
 # Definir el número de episodios y pasos máximos por episodio
-num_episodes = 10000
+num_episodes = 1000
 steps = []
 
 # Entrenar el agente
 for episode in range(num_episodes):
     state, probability, *_ = env.reset() # genera un nuevo tablero y devuelve el estado inicial
 
-    contador = 0
-    while True:
-        contador += 1
+    falls = 0
 
+    while True:
         # Seleccionar una acción con base en la Q-table actual
-        if np.random.uniform(0.5, 1) < epsilon:
+        if np.random.uniform(0.6, 1) < epsilon:
             action = env.action_space.sample()
         else:
             action = np.argmax(Q_table[state, :])
@@ -44,18 +44,27 @@ for episode in range(num_episodes):
         # Si se alcanza el estado final, terminar el episodio
         if done and reward == 0:
             state, probability, *_ = env.reset()
+            falls += 1
             
         elif done and reward == 1:
-            steps.append(contador)
             break
+
+    steps.append(falls)
     
     # Disminuir la probabilidad de exploración
-    epsilon = epsilon * 0.99
+    epsilon = epsilon * 0.999
 
     if epsilon < 0.01:
         epsilon = 0.01
 
-print("\nENTRENAMIENTO: Promedio de pasos por episodio: {}".format(sum(steps) / len(steps)))
+
+# Graficar el número de caídas por episodio
+steps = np.log10(steps) # para que se vea mejor la gráfica se aplica logaritmo
+plt.bar(np.arange(len(steps)), steps, color='blue', alpha=0.4)
+plt.title("Número de caídas por episodio")
+plt.xlabel("Episodio")
+plt.ylabel("Número de caídas")
+plt.show()
 
 
 # ------------------------------ JUGAR EL JUEGO CON AGENTE INTELIGENTE ------------------------------
@@ -63,11 +72,9 @@ print("\nENTRENAMIENTO: Promedio de pasos por episodio: {}".format(sum(steps) / 
 env = gym.make('FrozenLake-v1', desc=None, map_name="4x4", is_slippery=True, render_mode='human')
 
 state, probability, *_ = env.reset() # genera un nuevo tablero y devuelve el estado inicial
-contador = 0
+falls = 0
 
 while True:
-    contador += 1
-
     # Seleccionar la acción óptima utilizando la Q-table entrenada
     action = np.argmax(Q_table[state, :])
 
@@ -80,9 +87,10 @@ while True:
     # Si se alcanza el estado final, terminar el episodio
     if done and reward == 0:
         state, probability, *_ = env.reset()
+        falls += 1
         
     elif done and reward == 1:
-        print("\n\nDONE: finalizado después de {} pasos \n".format(contador))
+        print("\n\nDONE: finalizado después {} caidas\n".format(falls))
         break
 
 env.close()
