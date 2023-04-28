@@ -19,7 +19,8 @@ num_episodes = 1000
 steps = []
 
 # Entrenar el agente
-for episode in range(num_episodes):
+i = 0
+while i <= num_episodes:
     state, probability, *_ = env.reset() # genera un nuevo tablero y devuelve el estado inicial
 
     falls = 0
@@ -57,6 +58,11 @@ for episode in range(num_episodes):
     if epsilon < 0.01:
         epsilon = 0.01
 
+    if i == num_episodes:
+        if steps[-1] > steps[0]*0.3:
+            num_episodes += 500
+
+    i += 1
 
 # Graficar el número de caídas por episodio
 steps = np.log10(steps) # para que se vea mejor la gráfica se aplica logaritmo
