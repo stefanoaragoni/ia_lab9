@@ -83,7 +83,7 @@ plt.show()
 
 # ------------------------------ JUGAR EL JUEGO CON AGENTE INTELIGENTE ------------------------------
 
-env = gym.make('FrozenLake-v1', map_name="4x4", is_slippery=True, desc=generate_random_map(size=4))
+env = gym.make('FrozenLake-v1', map_name="4x4", is_slippery=True, desc=generate_random_map(size=4), render_mode='human')
 
 state, probability, *_ = env.reset() # genera un nuevo tablero y devuelve el estado inicial
 falls = 0
