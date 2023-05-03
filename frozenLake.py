@@ -16,16 +16,14 @@ alpha = 0.8 # tasa de aprendizaje
 epsilon = 0.99 # probabilidad de exploración
 
 # Definir el número de episodios y pasos máximos por episodio
-num_episodes = 100
+num_episodes = 500
 steps = []
 
 # Entrenar el agente
 i = 0
 while i <= num_episodes:
-    
     env = gym.make('FrozenLake-v1', map_name="4x4", is_slippery=True, desc=generate_random_map(size=4))
     state, probability, *_ = env.reset() # genera un nuevo tablero y devuelve el estado inicial
-
     falls = 0
 
     while True:
@@ -63,7 +61,7 @@ while i <= num_episodes:
 
     if i == num_episodes:
         if steps[-1] > steps[0]*0.3:
-            num_episodes += 500
+            num_episodes += 100
 
     i += 1
 
@@ -71,7 +69,7 @@ print("\nENTRENAMIENTO: Promedio de caídas: {}".format(np.mean(steps)))
 
 # Graficar el número de caídas por episodio
 steps = np.array(steps)
-steps[steps == 0] = 10
+steps[steps == 0] = 1
 steps = np.log10(steps) # para que se vea mejor la gráfica se aplica logaritmo
 h = np.arange(len(steps))
 
@@ -79,12 +77,12 @@ plt.bar(h, steps, color='blue')
 plt.title("Número de caídas por episodio")
 plt.xlabel("Episodio")
 plt.ylabel("Número de caídas")
+
 plt.show()
 
 # ------------------------------ JUGAR EL JUEGO CON AGENTE INTELIGENTE ------------------------------
 
-env = gym.make('FrozenLake-v1', map_name="4x4", is_slippery=True, desc=generate_random_map(size=4), render_mode='human')
-
+env = gym.make('FrozenLake-v1', map_name="4x4", is_slippery=True, desc=generate_random_map(size=4))
 state, probability, *_ = env.reset() # genera un nuevo tablero y devuelve el estado inicial
 falls = 0
 
